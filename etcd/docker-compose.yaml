@@ -1,0 +1,72 @@
+---
+name: etcd
+
+services:
+  etcd0:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd0
+    hostname: etcd0
+    restart: always
+    volumes:
+      - ./conf/etcd0:/conf
+      - ./certs:/certs
+      - etcd0_data:/data
+    ports:
+      - 23790:2379
+    environment:
+      ETCD_CONFIG_FILE: /conf/etcd.conf.yml
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd1
+    hostname: etcd1
+    restart: always
+    volumes:
+      - ./conf/etcd1:/conf
+      - ./certs:/certs
+      - etcd1_data:/data
+    ports:
+      - 23791:2379
+    environment:
+      ETCD_CONFIG_FILE: /conf/etcd.conf.yml
+    depends_on:
+      - etcd0
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd2
+    hostname: etcd2
+    restart: always
+    volumes:
+      - ./conf/etcd2:/conf
+      - ./certs:/certs
+      - etcd2_data:/data
+    ports:
+      - 23792:2379
+    environment:
+      ETCD_CONFIG_FILE: /conf/etcd.conf.yml
+    depends_on:
+      - etcd1
+
+volumes:
+  etcd0_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/etcd0
+  etcd1_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/etcd1
+  etcd2_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/etcd2
+
+networks:
+  default:
+    external: true
+    name: compose
