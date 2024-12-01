@@ -1,0 +1,70 @@
+---
+name: openvpn
+
+services:
+  openvpn:
+    image: atompi/openvpn:2.6.11
+    restart: always
+    ports:
+      - 1194:1194
+    volumes:
+      - ./data/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf:ro
+      - ./data/dnsmasq/resolv.dnsmasq:/etc/resolv.dnsmasq:ro
+      - dnsmasq_hosts:/dnsmasq.hosts
+      - app_etc:/etc/openvpn
+      - app_users:/openvpn-docker/users
+      - app_status:/tmp/status
+      - app_logs:/var/log/openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+
+  exporter:
+    image: kumina/openvpn-exporter
+    restart: always
+    ports:
+      - 9176:9176
+    volumes:
+      - app_status:/tmp/status:ro
+    command: -openvpn.status_paths /tmp/status/status.log
+    read_only: true
+    depends_on:
+      - openvpn
+
+volumes:
+  dnsmasq_hosts:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/dnsmasq/dnsmasq.hosts
+  app_etc:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/etc
+  app_users:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/users
+  app_status:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/status
+  app_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/logs
+
+networks:
+  default:
+    external: true
+    name: conpeer

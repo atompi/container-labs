@@ -1,0 +1,20 @@
+---
+name: frpc
+
+services:
+  frpc:
+    image: atompi/frpc:0.52.3
+    restart: always
+    extra_hosts:
+      - "atompi.cc:125.88.185.67"
+    volumes:
+      - ./logs:/app/logs
+      - ./conf/frpc.toml:/app/frpc.toml
+      - ./conf/ca.crt:/app/ca.crt
+      - ./conf/server.crt:/app/server.crt
+      - ./conf/server.key:/app/server.key
+
+networks:
+  default:
+    external: true
+    name: conpeer
