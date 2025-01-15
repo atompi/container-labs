@@ -1,0 +1,18 @@
+---
+name: pocketbase
+
+services:
+  pocketbase:
+    image: alpine:latest
+    restart: unless-stopped
+    volumes:
+      - ./home:/pb
+    command:
+      - /pb/pocketbase
+      - serve
+      - --http=0.0.0.0:8080
+
+networks:
+  default:
+    external: true
+    name: compose
