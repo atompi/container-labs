@@ -1,0 +1,30 @@
+---
+name: "coredns"
+
+services:
+  coredns:
+    image: coredns/coredns:1.12.0
+    command: -conf /data/Corefile
+    ports:
+      - "1053:53/udp"
+      - "1053:53/tcp"
+      - "18080:8080"
+      - "9153:9153"
+    volumes:
+      - ./data:/data:ro
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+networks:
+  default:
+    external: true
+    name: compose

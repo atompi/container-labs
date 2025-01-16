@@ -1,0 +1,20 @@
+.:53 {
+    reload 10s
+    health
+    prometheus :9153
+    errors
+    log
+    loadbalance
+    cache 30
+    hosts /data/hosts {
+        fallthrough
+        ttl 10
+        reload 10s
+    }
+    auto {
+        directory /data/zones/default
+        reload 10s
+    }
+    loop
+    forward . 114.114.114.114 114.114.115.115
+}

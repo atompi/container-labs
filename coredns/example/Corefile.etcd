@@ -1,0 +1,17 @@
+.:53 {
+    reload 10s
+    health
+    prometheus :9153
+    errors
+    log
+    loadbalance
+    cache 30
+    etcd {
+        fallthrough
+        path /coredns
+        endpoint https://192.168.220.128:23790 https://192.168.220.128:23791 https://192.168.220.128:23792
+        tls /data/certs/etcd.pem /data/certs/etcd-key.pem /data/certs/etcd-ca.pem
+    }
+    loop
+    forward . 114.114.114.114 114.114.115.115
+}
