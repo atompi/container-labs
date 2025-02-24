@@ -1,0 +1,23 @@
+---
+name: openwebui
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:v0.5.16
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - data:/app/backend/data
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data
+
+networks:
+  default:
+    external: true
+    name: compose
