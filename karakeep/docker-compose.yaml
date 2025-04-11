@@ -1,0 +1,47 @@
+---
+name: karakeep
+
+services:
+  karakeep:
+    image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - karakeep:/data
+  chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.1
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - meilisearch:/meili_data
+
+volumes:
+  karakeep:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/karakeep
+  meilisearch:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/meilisearch
+
+networks:
+  default:
+    external: true
+    name: compose
