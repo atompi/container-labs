@@ -1,7 +1,18 @@
 ---
-name: mysql
+name: stock
 
 services:
+  stock:
+    image: mayanghua/instock:202503
+    restart: unless-stopped
+    ports:
+      - 9988:9988
+    environment:
+      - db_host=mysql
+      - db_port=3306
+      - db_user=root
+      - db_password=mysqlpassword
+      - db_database=instockdb
   mysql:
     image: mysql:8.4
     restart: unless-stopped
@@ -22,7 +33,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: $PWD/data
+      device: $PWD/data/mysql
 
 networks:
   default:
