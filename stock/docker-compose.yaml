@@ -3,7 +3,7 @@ name: stock
 
 services:
   stock:
-    image: mayanghua/instock:202503
+    image: atompi/stock:latest
     restart: unless-stopped
     ports:
       - 9988:9988
@@ -13,19 +13,27 @@ services:
       - db_user=root
       - db_password=mysqlpassword
       - db_database=instockdb
+    volumes:
+      - stock_log:/data/InStock/instock/log
+    depends_on:
+      mysql:
+        condition: service_healthy
   mysql:
     image: mysql:8.4
     restart: unless-stopped
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --mysql-native-password=ON
     environment:
       - MYSQL_ROOT_PASSWORD=mysqlpassword
-    ports:
-      - 3306:3306
-      - 33060:33060
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mysql_data:
@@ -34,6 +42,12 @@ volumes:
       type: none
       o: bind
       device: $PWD/data/mysql
+  stock_log:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/stock/log
 
 networks:
   default:

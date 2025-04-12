@@ -1,0 +1,29 @@
+---
+name: minio
+
+services:
+  minio:
+    image: minio/minio:RELEASE.2025-03-12T18-04-18Z
+    restart: unless-stopped
+    command:
+      - server
+      - --console-address
+      - :9001
+    environment:
+      MINIO_CONFIG_ENV_FILE: /etc/config.env
+    volumes:
+      - ./config.env:/etc/config.env
+      - data:/mnt/data
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data
+
+networks:
+  default:
+    external: true
+    name: compose
