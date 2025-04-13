@@ -15,6 +15,11 @@ services:
       - 33060:33060
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mysql_data:
