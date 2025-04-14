@@ -1,4 +1,4 @@
 ```
-mkdir -p ./data/{mysql,stock/log}
+mkdir -p ./data/{mariadb,stock/log}
 docker compose up -d
 ```
