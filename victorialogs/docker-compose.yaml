@@ -1,0 +1,32 @@
+---
+name: victorialogs
+
+services:
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.19.0-victorialogs
+    restart: unless-stopped
+    command:
+      - -storageDataPath=victoria-logs-data
+    ports:
+      - 9428:9428
+    volumes:
+      - data:/victoria-logs-data
+    healthcheck:
+      test: ["CMD", "wget", "http://127.0.0.1:9428", "-q", "-O", "/dev/null"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data
+
+networks:
+  default:
+    external: true
+    name: compose
