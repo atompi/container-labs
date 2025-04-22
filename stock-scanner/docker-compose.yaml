@@ -3,26 +3,15 @@ name: stock-scanner
 
 services:
   stock-scanner:
-    image: cassianvale/stock-scanner:latest
+    image: atompi/stock-scanner:latest
     restart: unless-stopped
     ports:
-      - 8888:8888
-    environment:
-      - API_KEY=${API_KEY}
-      - API_URL=${API_URL}
-      - API_MODEL=${API_MODEL}
-      - API_TIMEOUT=${API_TIMEOUT}
-      - LOGIN_PASSWORD=${LOGIN_PASSWORD}
-      - ANNOUNCEMENT_TEXT=${ANNOUNCEMENT_TEXT}
+      - 8888:8080
+    env_file:
+      - .env
     volumes:
       - data:/app/data
       - logs:/app/logs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "-s", "http://127.0.0.1:8888/api/config"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
 
 volumes:
   data:
