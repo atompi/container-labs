@@ -1,0 +1,24 @@
+---
+name: stalwart
+
+services:
+  stalwart:
+    image: stalwartlabs/stalwart:latest
+    restart: unless-stopped
+    volumes:
+      - ./data:/opt/stalwart
+    ports:
+      - 25:25
+      - 110:110
+      - 143:143
+      - 465:465
+      - 587:587
+      - 993:993
+      - 995:995
+      - 4190:4190
+      - 8080:8080
+
+networks:
+  default:
+    external: true
+    name: compose
