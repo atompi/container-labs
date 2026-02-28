@@ -85,6 +85,8 @@ docker-compose -f docker-compose-image-tag.yml up -d
 
 ## Tips
 
+### docker compose 版本要求：>=2.24.0
+
 ### 默认超级管理员
 
 - 用户名：admin
