@@ -1,0 +1,38 @@
+---
+name: 'excalidraw'
+
+services:
+  excalidraw-app:
+    image: atompi/excalidraw:v0.18.0-fork-b3
+    restart: unless-stopped
+    environment:
+      - VITE_APP_BACKEND_V2_GET_URL=https://${STORAGE_BACKEND_HOST}/api/v2/scenes/
+      - VITE_APP_BACKEND_V2_POST_URL=https://${STORAGE_BACKEND_HOST}/api/v2/scenes/
+      - VITE_APP_WS_SERVER_URL=https://${ROOM_HOST}/
+      - VITE_APP_FIREBASE_CONFIG={}
+      - VITE_APP_HTTP_STORAGE_BACKEND_URL=https://${STORAGE_BACKEND_HOST}/api/v2
+      - VITE_APP_STORAGE_BACKEND=http
+      - VITE_APP_DISABLE_TRACKING=true
+      - PUBLIC_URL=https://${APP_HOST}
+  excalidraw-storage:
+    image: atompi/excalidraw-storage-backend:v2023.11.11
+    restart: unless-stopped
+    environment:
+      - STORAGE_URI=mongodb://${DB_USER}:${DB_PASS}@excalidraw-mongodb:27017
+  excalidraw-room:
+    image: atompi/excalidraw-room:latest
+    restart: unless-stopped
+  excalidraw-mongodb:
+    image: mongo:7.0.30-jammy
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASS}
+    volumes:
+      - ${DB_VOLUME_PATH}:/data/db
+    user: "1000"
+
+networks:
+  default:
+    external: true
+    name: nginx_proxy
