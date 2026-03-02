@@ -1,0 +1,11 @@
+name: cdpbrowser
+
+services:
+  browser:
+    image: atompi/cdpbrowser:latest
+    restart: unless-stopped
+    ports:
+      - 9222:9222
+      - 5900:5900
+      - 6080:6080
+    env_file: .env
