@@ -17,6 +17,12 @@ docker pull postgres:16
 docker pull redis:7
 ```
 
+PS: 打包镜像（可选）
+
+```
+docker save -o superset-stack.tar apachesuperset.docker.scarf.sh/apache/superset:6.0.0 postgres:16 redis:7
+```
+
 3. 修改 docker-compose-image-tag.yml 文件
 
 - 末尾 volumes 修改为：
