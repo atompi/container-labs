@@ -2,7 +2,9 @@ FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+RUN --mount=type=cache,id=openclaw-sandbox-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,id=openclaw-sandbox-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
+  sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
     bash \
@@ -20,11 +22,9 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debi
     socat \
     websockify \
     x11vnc \
-    xvfb \
-  && rm -rf /var/lib/apt/lists/*
+    xvfb
 
-COPY scripts/sandbox-browser-entrypoint.sh /usr/local/bin/openclaw-sandbox-browser
-RUN chmod +x /usr/local/bin/openclaw-sandbox-browser
+COPY --chmod=755 scripts/sandbox-browser-entrypoint.sh /usr/local/bin/openclaw-sandbox-browser
 
 RUN useradd --create-home --shell /bin/bash sandbox
 USER sandbox
