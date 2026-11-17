@@ -1,0 +1,49 @@
+server_name: $SERVER_NAME
+
+# Client port of 4222 on all interfaces
+port: 4222
+
+# HTTP monitoring port
+monitor_port: 8222
+
+# This is for clustering multiple servers together.
+cluster {
+  # It is recommended to set a cluster name
+  name: "aura-nats"
+
+  # Route connections to be received on any interface on port 6222
+  port: 6222
+
+  # Routes are protected, so need to use them with --routes flag
+  # e.g. --routes=nats-route://ruser:T0pS3cr3t@otherdockerhost:6222
+  authorization {
+    user: ruser
+    password: T0pS3cr3t
+    timeout: 2
+  }
+
+  # Routes are actively solicited and connected to from this server.
+  # This Docker image has none by default, but you can pass a
+  # flag to the nats-server docker image to create one to an existing server.
+  routes = [
+    nats://ruser:T0pS3cr3t@nats-1:6222
+    nats://ruser:T0pS3cr3t@nats-2:6222
+    nats://ruser:T0pS3cr3t@nats-3:6222
+  ]
+}
+
+jetstream {
+  store_dir: /data/jetstream
+}
+
+authorization {
+  include 'includes/users.conf' # Pull in from file
+  timeout: 0.5
+}
+
+# TLS
+# tls {
+#   cert_file: "/path/to/server.crt"
+#   key_file:  "/path/to/server.key"
+#   verify:    true
+# }

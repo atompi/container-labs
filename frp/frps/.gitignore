@@ -1,2 +1,3 @@
-/logs/
-/conf/
+logs/
+conf/
+docker/frps

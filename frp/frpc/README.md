@@ -5,7 +5,7 @@ cat > conf/frpc.toml <<EOF
 user = "atompi"
 
 serverAddr = "atompi.cc"
-serverPort = 12590
+serverPort = 7000
 
 log.to = "./logs/frpc.log"
 log.level = "info"
@@ -13,19 +13,20 @@ log.maxDays = 3
 log.disablePrintColor = true
 
 auth.method = "token"
-auth.token = "secret_string"
+auth.token = "change_me"
 
 transport.tls.enable = true
 transport.tls.certFile = "server.crt"
 transport.tls.keyFile = "server.key"
 transport.tls.trustedCaFile = "ca.crt"
 
+
 [[proxies]]
-name = "test"
+name = "test-tcp"
 type = "tcp"
-localIP = "192.168.220.128"
-localPort = 80
-remotePort = 80
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = 6000
 transport.useEncryption = true
 transport.useCompression = true
 EOF

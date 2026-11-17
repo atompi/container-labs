@@ -1,0 +1,85 @@
+---
+name: docling
+
+x-docling-serve-base: &docling-serve-base
+  image: quay.io/docling-project/docling-serve-cpu:v1.26.0
+  environment:
+    - DOCLING_SERVE_ENABLE_UI=1
+    - DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true
+    - HF_ENDPOINT=https://hf-mirror.com
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 40s
+    start_interval: 5s
+
+x-vllm-base: &vllm-base
+  image: vllm/vllm-openai-cpu:latest-x86_64
+  restart: unless-stopped
+  cap_add:
+    - SYS_NICE
+  environment:
+    - HF_ENDPOINT=https://hf-mirror.com
+
+services:
+  docling-serve-1:
+    <<: *docling-serve-base
+    container_name: docling-serve-1
+    volumes:
+      - cache-docling-serve-1:/opt/app-root/src/.cache
+    ports:
+      - "5001:5001"
+
+  docling-serve-2:
+    <<: *docling-serve-base
+    container_name: docling-serve-2
+    volumes:
+      - cache-docling-serve-2:/opt/app-root/src/.cache
+    ports:
+      - "5002:5001"
+
+  vllm-rerank:
+    <<: *vllm-base
+    volumes:
+      - cache-vllm-rerank:/root/.cache
+    command: ["Qwen/Qwen3-Reranker-0.6B", "--gpu-memory-utilization", "0.2", "--runner", "pooling", "--max-model-len", "1024"]
+
+  vllm-embedding:
+    <<: *vllm-base
+    volumes:
+      - cache-vllm-embedding:/root/.cache
+    command: ["Qwen/Qwen3-Embedding-0.6B", "--gpu-memory-utilization", "0.2", "--runner", "pooling", "--max-model-len", "1024"]
+
+volumes:
+  cache-docling-serve-1:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/cache/docling-serve/1
+  cache-docling-serve-2:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/cache/docling-serve/2
+  cache-vllm-rerank:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/cache/vllm/rerank
+  cache-vllm-embedding:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/cache/vllm/embedding
+
+networks:
+  default:
+    external: true
+    name: compose

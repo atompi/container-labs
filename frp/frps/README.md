@@ -3,7 +3,7 @@ mkdir -p logs conf
 
 cat > conf/frps.toml <<EOF
 bindAddr = "0.0.0.0"
-bindPort = 12590
+bindPort = 7000
 
 transport.maxPoolCount = 5000
 
@@ -20,12 +20,12 @@ log.maxDays = 3
 log.disablePrintColor = true
 
 webServer.addr = "0.0.0.0"
-webServer.port = 12570
+webServer.port = 7001
 webServer.user = "admin"
-webServer.password = "secret_string"
+webServer.password = "change_me"
 
 auth.method = "token"
-auth.token = "secret_string"
+auth.token = "change_me"
 
 allowPorts = [
   { start = 32000, end = 32999 },

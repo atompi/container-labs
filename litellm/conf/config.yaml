@@ -1,0 +1,54 @@
+model_list:
+  - model_name: sf/Qwen/Qwen3-Embedding-4B
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Embedding-4B
+      api_key: os.environ/SF_API_KEY
+      api_base: https://api.siliconflow.cn/v1
+  - model_name: sf/Qwen/Qwen3-Reranker-4B
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Reranker-4B
+      api_key: os.environ/SF_API_KEY
+      api_base: https://api.siliconflow.cn/v1
+  - model_name: mx/MiniMax-M3
+    litellm_params:
+      model: openai/MiniMax-M3
+      api_key: os.environ/MX_API_KEY
+      api_base: https://api.minimaxi.com/v1
+
+general_settings:
+  proxy_batch_write_at: 60
+  database_connection_pool_limit: 10
+  disable_error_logs: True
+  allow_requests_on_db_unavailable: True
+  use_redis_transaction_buffer: True
+  block_robots: True
+  store_model_in_db: True
+  store_prompts_in_spend_logs: True
+  pass_through_endpoints:
+    - path: "/v1/rerank"
+      target: "http://localhost:4000/rerank"
+      headers:
+        Authorization: "Bearer os.environ/SELF_API_KEY"
+        content-type: application/json
+        accept: application/json
+      forward_headers: true
+
+litellm_settings:
+  modify_params: True
+  drop_params: True
+  check_provider_endpoint: True
+  request_timeout: 3000
+  set_verbose: False
+  json_logs: True
+  cache: True
+  cache_params:
+    type: redis
+    host: os.environ/REDIS_HOST
+    port: os.environ/REDIS_PORT
+    password: os.environ/REDIS_PASSWORD
+
+router_settings:
+  routing_strategy: simple-shuffle
+  redis_host: os.environ/REDIS_HOST
+  redis_port: os.environ/REDIS_PORT
+  redis_password: os.environ/REDIS_PASSWORD

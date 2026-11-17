@@ -1,0 +1,72 @@
+---
+name: "nats"
+
+services:
+  nats-1:
+    image: nats:2.14.7
+    container_name: nats-1
+    hostname: nats-1
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./conf/nats.conf:/nats.conf
+      - nats-1-data:/data/jetstream
+    environment:
+      - SERVER_NAME=nats-1
+    command: ["-c", "/nats.conf"]
+
+  nats-2:
+    image: nats:2.14.7
+    container_name: nats-2
+    hostname: nats-2
+    ports:
+      - "4223:4222"
+    volumes:
+      - ./conf/nats.conf:/nats.conf
+      - nats-2-data:/data/jetstream
+    environment:
+      - SERVER_NAME=nats-2
+    command: ["-c", "/nats.conf"]
+    depends_on:
+      - nats-1
+
+  nats-3:
+    image: nats:2.14.7
+    container_name: nats-3
+    hostname: nats-3
+    ports:
+      - "4224:4222"
+    volumes:
+      - ./conf/nats.conf:/nats.conf
+      - nats-3-data:/data/jetstream
+    environment:
+      - SERVER_NAME=nats-3
+    command: ["-c", "/nats.conf"]
+    depends_on:
+      - nats-2
+
+volumes:
+  nats-1-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/nats-1
+  nats-2-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/nats-2
+  nats-3-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/nats-3
+
+networks:
+  default:
+    external: true
+    name: compose

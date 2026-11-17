@@ -10,7 +10,7 @@ services:
     volumes:
       - karakeep:/data
   chrome:
-    image: gcr.io/zenika-hub/alpine-chrome:123
+    image: zenika/alpine-chrome:124
     restart: unless-stopped
     command:
       - --no-sandbox
@@ -20,7 +20,7 @@ services:
       - --remote-debugging-port=9222
       - --hide-scrollbars
   meilisearch:
-    image: getmeili/meilisearch:v1.11.1
+    image: getmeili/meilisearch:v1.41.0
     restart: unless-stopped
     env_file:
       - .env

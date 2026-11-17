@@ -3,10 +3,10 @@ name: frpc
 
 services:
   frpc:
-    image: atompi/frpc:0.52.3
+    image: atompi/frpc:0.59.0
     restart: always
     extra_hosts:
-      - "atompi.cc:125.88.185.67"
+      - "atompi.cc:192.168.0.2"
     volumes:
       - ./logs:/app/logs
       - ./conf/frpc.toml:/app/frpc.toml

@@ -1,0 +1,70 @@
+---
+name: litellm
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm-database:v1.99.0
+    restart: unless-stopped
+    command: ["--config", "/app/config.yaml"]
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - ./conf/config.yaml:/app/config.yaml
+    depends_on:
+      - redis
+      - db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    command:
+      - --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "PING"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/db
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data/redis
+
+networks:
+  default:
+    external: true
+    name: compose

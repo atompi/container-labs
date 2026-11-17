@@ -1,0 +1,56 @@
+---
+name: rustfs
+
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    env_file: .env
+    volumes:
+      - logs:/app/logs
+      - data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sh", "-ec",
+          "host=\"$${RUSTFS_HEALTHCHECK_HOST:-127.0.0.1}\"; scheme=\"http\"; set -- -fsS; \
+          if [ -n \"$${RUSTFS_TLS_PATH:-}\" ]; then \
+            scheme=\"https\"; \
+            ca_path=\"$${RUSTFS_HEALTHCHECK_CA:-}\"; \
+            if [ -z \"$${ca_path}\" ] && [ -f /opt/tls/ca.crt ]; then ca_path=/opt/tls/ca.crt; fi; \
+            case \"$${host}\" in 127.0.0.1|localhost) strict_host=false ;; *) strict_host=true ;; esac; \
+            if [ \"$${strict_host}\" = true ] && [ -n \"$${ca_path}\" ]; then \
+              set -- \"$${@}\" --cacert \"$${ca_path}\" --resolve \"$${host}:9000:127.0.0.1\" --resolve \"$${host}:9001:127.0.0.1\"; \
+            else \
+              set -- \"$${@}\" -k; \
+            fi; \
+          fi; \
+          curl \"$${@}\" \"$${scheme}://$${host}:9000/health\" && \
+          curl \"$${@}\" \"$${scheme}://$${host}:9001/rustfs/console/health\""
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/logs
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/data
+
+networks:
+  default:
+    external: true
+    name: compose

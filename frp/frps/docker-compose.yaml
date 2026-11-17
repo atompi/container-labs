@@ -3,22 +3,11 @@ name: frps
 
 services:
   frps:
-    image: atompi/frps:0.52.3
+    image: atompi/frps:0.59.0
     restart: always
     ports:
-      - "12590:12590"
-      - "32522:32522"
-      - "32580:32580"
-      - "32591:32591"
-      - "80:80"
-      - "443:443"
-      - "25:25"
-      - "110:110"
-      - "143:143"
-      - "465:465"
-      - "587:587"
-      - "993:993"
-      - "995:995"
+      - "7000:7000"
+      - "7001:7001"
     volumes:
       - ./logs:/app/logs
       - ./conf/frps.toml:/app/frps.toml
